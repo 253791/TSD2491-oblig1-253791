@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using TSD2491_oblig1_253791.Models;
 
@@ -15,6 +15,19 @@ namespace TSD2491_oblig1_253791.Controllers
 
         public IActionResult Index()
         {
+            List<string> animalEmoji = new List<string>()
+            {
+                "🐤", "🐤",
+                "🐷", "🐷",
+                "🐭", "🐭",
+                "🐯", "🐯",
+                "🐰", "🐰",
+                "🐼", "🐼",
+                "🦁", "🦁",
+                "🐮", "🐮",
+            };
+
+            ViewData["AnimalEmoji"] = animalEmoji;
             return View();
         }
 
