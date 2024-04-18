@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Reflection;
 using TSD2491_oblig1_253791.Models;
+
 
 namespace TSD2491_oblig1_253791.Controllers
 {
     public class HomeController : Controller
     {
-        private static HomeModel model = new HomeModel();
+        private HomeModel model = new HomeModel();
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
@@ -17,13 +17,35 @@ namespace TSD2491_oblig1_253791.Controllers
 
         public IActionResult Index()
         {
+            HomeModel.DisplayedEmojis.Clear();
+            RandomizeEmojiTable();
             SetupGame();
             return View(model); // Gi modellen til view
         }
 
+        private void RandomizeEmojiTable()
+        {
+            var possibleTables = new List<string> { "AnimalEmoji", "FoodEmoji", "BallEmoji" };
+            Random random = new Random();
+            int randomIndex = random.Next(possibleTables.Count);
+            model.CurrentEmojiTable = possibleTables[randomIndex];
+        }
+
         private void SetupGame()
         {
-            ShuffleList(model.AnimalEmoji);
+            switch (model.CurrentEmojiTable)
+            {
+                case "FoodEmoji":
+                    HomeModel.DisplayedEmojis.AddRange(model.FoodEmoji);
+                    break;
+                case "BallEmoji":
+                    HomeModel.DisplayedEmojis.AddRange(model.BallEmoji);
+                    break;
+                case "AnimalEmoji":
+                    HomeModel.DisplayedEmojis.AddRange(model.AnimalEmoji);
+                    break;
+            }
+            ShuffleList(HomeModel.DisplayedEmojis);
         }
 
         private static void ShuffleList<T>(List<T> list)
@@ -51,34 +73,32 @@ namespace TSD2491_oblig1_253791.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [HttpPost]
         public ActionResult CheckMatch(int buttonIndex)
         {
-            string clickedEmoji = model.AnimalEmoji[buttonIndex];
+            string clickedEmoji = HomeModel.DisplayedEmojis[buttonIndex];
 
-            if (model.PreviousEmoji == clickedEmoji)
+            if (HomeModel.PreviousEmoji == clickedEmoji)
             {
-                // Match, fjern sist klikket emoji
-                model.AnimalEmoji[buttonIndex] = "";
-
-                // Finn forrige matchende emoji
-                for (int i = 0; i < model.AnimalEmoji.Count; i++)
+                for (int i = 0; i < HomeModel.DisplayedEmojis.Count; i++)
                 {
-                    if (i != buttonIndex && model.AnimalEmoji[i] == model.PreviousEmoji)
+                    if (HomeModel.DisplayedEmojis[i] == clickedEmoji)
                     {
-                        model.AnimalEmoji[i] = ""; // fjern forrige emoji
-                        break; 
+                        HomeModel.DisplayedEmojis[i] = ""; // fjern forrige emoji
                     }
                 }
 
-                model.PreviousEmoji = null; // reset
+                HomeModel.PreviousEmoji = null; // reset
             }
             else
             {
-                model.PreviousEmoji = clickedEmoji;
+                HomeModel.PreviousEmoji = clickedEmoji;
             }
 
             return View("Index", model);
+        }
+        public IActionResult NewGame()
+        {
+            return RedirectToAction("Index"); // Redirect to refresh with new emojis
         }
     }
 }

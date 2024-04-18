@@ -6,7 +6,9 @@
 
 <style>
     .container {
-        width: 400px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     button {
@@ -14,25 +16,48 @@
         height: 100px;
         font-size: 50px;
     }
+
+    .row {
+        justify-content: center;
+    }
+
+    .col-3 {
+        padding: 0px;
+        width: 100px;
+    }
+
+    .game {
+        width: 400px;
+    }
+
+    .newGame {
+        margin-top: 10px;
+    }
 </style>
 
 <div class="text-center">
     <h1 class="display-4">TSD2491 - Oblig1</h1>
 </div>
 
-<div class="container">
+<div class="game">
     <div class="row">
-        @for (int i = 0; i < Model.AnimalEmoji.Count; i++)
+        @for (int i = 0; i < HomeModel.DisplayedEmojis.Count; i++)
         {
             <div class="col-3">
-                @using (Html.BeginForm("CheckMatch", "Home", FormMethod.Post))
-                {
+                <form action="/Home/CheckMatch" method="post">
                     <input type="hidden" name="buttonIndex" value="@i" />
-                    <button type="submit" class="btn btn-outline-dark">
-                        <h1>@Model.AnimalEmoji[i]</h1>
+                    <button type="submit" name="submit" value="CheckMatch" class="btn btn-outline-dark">
+                        <h1>@HomeModel.DisplayedEmojis[i]</h1>
                     </button>
-                }
+                </form>
             </div>
         }
     </div>
 </div>
+
+<div class="text-center newGame">
+    <form action="/Home/NewGame" method="post">
+        <button type="submit" name="submit" value="NewGame" class="btn btn-outline-dark">New Game</button>
+    </form>
+</div>
+
