@@ -8,6 +8,8 @@ namespace TSD2491_oblig1_253791.Controllers
     public class HomeController : Controller
     {
         private HomeModel model = new HomeModel();
+        private bool gameIsWon = false;
+        private bool userPressed;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
@@ -75,10 +77,12 @@ namespace TSD2491_oblig1_253791.Controllers
 
         public ActionResult CheckMatch(int buttonIndex)
         {
+            userPressed = true;
             string clickedEmoji = HomeModel.DisplayedEmojis[buttonIndex];
 
             if (HomeModel.PreviousEmoji == clickedEmoji)
             {
+                HomeModel.NumberMatched++;
                 for (int i = 0; i < HomeModel.DisplayedEmojis.Count; i++)
                 {
                     if (HomeModel.DisplayedEmojis[i] == clickedEmoji)
@@ -92,6 +96,20 @@ namespace TSD2491_oblig1_253791.Controllers
             else
             {
                 HomeModel.PreviousEmoji = clickedEmoji;
+            }
+            if (HomeModel.NumberMatched == 8)
+            {
+                HomeModel.NumberMatched = 0;
+                gameIsWon = true;
+            }
+            if (userPressed == true)
+            {
+                model.GameStatus = "Game Running";
+            }
+            if (gameIsWon)
+            {
+                userPressed = false;
+                model.GameStatus = "Game Complete";
             }
 
             return View("Index", model);

@@ -8,6 +8,8 @@
         public static string PreviousEmoji { get; set; } = string.Empty;
         public string CurrentEmojiTable { get; set; }
         public static List<string> DisplayedEmojis { get; set; } = new List<string>();
+        public string GameStatus { get; set; } = "";
+        public static int NumberMatched { get; set; }
 
         public HomeModel()
         {
