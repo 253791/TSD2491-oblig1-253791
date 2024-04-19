@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Reflection;
 using TSD2491_oblig1_253791.Models;
 
 
@@ -20,6 +21,8 @@ namespace TSD2491_oblig1_253791.Controllers
         public IActionResult Index()
         {
             HomeModel.DisplayedEmojis.Clear();
+            var currentUsername = HttpContext.Session.GetString("CurrentUsername");
+            ViewBag.CurrentUsername = currentUsername;
             RandomizeEmojiTable();
             SetupGame();
             return View(model); // Gi modellen til view
@@ -108,6 +111,13 @@ namespace TSD2491_oblig1_253791.Controllers
             }
             if (gameIsWon)
             {
+                var username = HttpContext.Session.GetString("CurrentUsername");
+                var user = HomeModel.RegisteredUsers.FirstOrDefault(u => u.Username == username);
+                if (user != null)
+                {
+                    user.GamesPlayed++;
+                }
+
                 userPressed = false;
                 model.GameStatus = "Game Complete";
             }
@@ -117,6 +127,24 @@ namespace TSD2491_oblig1_253791.Controllers
         public IActionResult NewGame()
         {
             return RedirectToAction("Index"); // Redirect to refresh with new emojis
+        }
+
+        public IActionResult RegisterUser(string username)
+        {
+            HttpContext.Session.Remove("CurrentUsername");
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("CurrentUsername")))
+            {
+                HttpContext.Session.SetString("CurrentUsername", username);
+
+                var user = HomeModel.RegisteredUsers.FirstOrDefault(u => u.Username == username);
+                if (user == null)
+                {
+                    user = new HomeModel.User { Username = username, GamesPlayed = 0 };
+                    HomeModel.RegisteredUsers.Add(user);
+
+                }
+            }
+            return RedirectToAction("Index", model);
         }
     }
 }

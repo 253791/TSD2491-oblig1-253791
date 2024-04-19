@@ -49,5 +49,12 @@
                 "🎱", "🎱",
             };
         }
+        public static List<User> RegisteredUsers { get; set; } = new List<User>();
+
+        public class User
+        {
+            public string? Username { get; set; }
+            public int GamesPlayed { get; set; }
+        }
     }
 }
